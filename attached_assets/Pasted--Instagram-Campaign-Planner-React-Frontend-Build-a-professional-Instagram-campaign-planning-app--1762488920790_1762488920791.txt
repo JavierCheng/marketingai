@@ -1,0 +1,283 @@
+# Instagram Campaign Planner - React Frontend
+
+Build a professional Instagram campaign planning app with drag-and-drop calendar, multi-step campaign creation, and double-sidebar layout. Use ONLY mock data (no backend).
+
+## Tech Stack
+
+```json
+{
+  "framework": "React 18 + Vite",
+  "styling": "TailwindCSS",
+  "drag-drop": "@dnd-kit/core, @dnd-kit/sortable",
+  "icons": "lucide-react",
+  "dates": "date-fns"
+}
+```
+
+## Core Features
+
+### 1. Multi-Step Campaign Modal (4 Steps)
+
+**Trigger:** “Create Campaign” button in sidebar
+
+**Step 1 - Purpose:**
+
+- Dropdown: “Product Launch”, “Event Promotion”, “Brand Awareness”, “Engagement Campaign”, “Seasonal Campaign”, “Other”
+- Textarea: Campaign description (500 char limit)
+
+**Step 2 - Timeline:**
+
+- Start date picker (min: today)
+- End date picker (min: start date + 1)
+- Show campaign duration dynamically
+
+**Step 3 - Content Volume:**
+
+- Number input: Posts (default 5, min 1, max 50) with +/- buttons
+- Number input: Reels (default 3, min 1, max 30) with +/- buttons
+- Show total content pieces
+
+**Step 4 - Review:**
+
+- Textarea: Additional requirements (optional)
+- Summary card showing all previous inputs
+- “Create Campaign” button
+
+**Modal specs:**
+
+- Max-width 600px, centered, white card, rounded-xl, shadow-2xl
+- Progress indicator: 4 circles showing current step
+- Navigation: “Back” and “Next” buttons (disabled if required fields empty)
+- Close with X button or ESC key
+- Validation before proceeding to next step
+
+### 2. Layout - Double Sidebar Design
+
+**LEFT SIDEBAR (240px, fixed, always visible):**
+
+```
+┌─ Logo + "Campaign Planner"
+├─ "Create Campaign" button (primary blue, full width)
+├─ Navigation:
+│  • Dashboard (Home icon)
+│  • Campaigns (Calendar icon) ← active
+│  • Instagram (Instagram icon)
+│  • Settings (Settings icon)
+└─ User profile card at bottom
+```
+
+**CENTER (flex-1, main content):**
+
+- Calendar header: Month/Year with prev/next buttons + “Today” button
+- Monthly calendar grid (7 cols, auto rows, min-h-32 per cell)
+- Day names header row (Sun-Sat)
+- Each cell: white bg, rounded, border, can contain multiple content blocks
+- Today highlighted with blue circle on date number
+- Weekends: light gray background
+
+**RIGHT SIDEBAR (320px, collapsible):**
+
+- Toggle button (arrow icon) on left edge
+- When open: “All Content” header + scrollable list of all content blocks
+- Grouped by date with sticky date headers
+- Smooth slide animation (300ms)
+- Default: Open
+
+### 3. Content Block Design
+
+**Visual (both calendar & sidebar):**
+
+- Border-left: 3px solid (blue for post, purple for reel)
+- White bg, rounded-lg, shadow-sm, p-3
+- Layout:
+  
+  ```
+  [Drag Handle] [Type Icon] [Title text...]        [Status Badge]
+                              Time: 2:00 PM
+                              Description...
+  ```
+- Type icons: Camera (post), Video (reel)
+- Status badges: Draft (gray), Scheduled (blue), Published (green)
+- Hover: scale 1.02, deeper shadow
+- Drag handle: GripVertical icon, gray, cursor grab
+
+**In sidebar only:**
+
+- Add input field for Canva link (placeholder: “Add Canva link…”)
+- Show edit (Pencil) and delete (Trash2) icon buttons
+
+### 4. Drag and Drop (CRITICAL)
+
+**Must use @dnd-kit:**
+
+- Any content block is draggable
+- Any calendar day cell is a drop zone
+- During drag: block at 50% opacity, cursor grabbing
+- Drop zone hover: blue-50 bg, dashed blue border
+- On drop: update block’s scheduledDate to target day, keep same time
+- Within same day: reorderable vertically
+- Show toast notification: “Content moved to [date]”
+- Smooth animations for all movements
+
+### 5. Mock Data Structure
+
+Create `src/data/mockData.js`:
+
+```javascript
+export const mockCampaign = {
+  id: "campaign-1",
+  title: "Summer Product Launch 2025",
+  purpose: "Product Launch",
+  description: "Launching new summer collection focused on sustainability",
+  startDate: "2025-11-10",
+  endDate: "2025-11-24",
+  numPosts: 8,
+  numReels: 4,
+  additionalRequirements: "Use #SustainableFashion. Posting times: 10 AM, 6 PM EST"
+};
+
+export const mockContentBlocks = [
+  {
+    id: "block-1",
+    type: "post",
+    title: "Teaser: New Collection Sneak Peek",
+    description: "Build anticipation with behind-the-scenes look",
+    scheduledDate: "2025-11-10T10:00:00Z",
+    canvaLink: "https://canva.com/design/example1",
+    status: "draft",
+    orderIndex: 0
+  },
+  {
+    id: "block-2",
+    type: "reel",
+    title: "Meet the Designer",
+    description: "15-second intro video featuring lead designer",
+    scheduledDate: "2025-11-10T18:00:00Z",
+    canvaLink: "",
+    status: "draft",
+    orderIndex: 1
+  },
+  {
+    id: "block-3",
+    type: "post",
+    title: "Product Spotlight: Organic Cotton Tee",
+    description: "Highlight key product with sustainability stats",
+    scheduledDate: "2025-11-12T10:00:00Z",
+    canvaLink: "",
+    status: "scheduled",
+    orderIndex: 2
+  },
+  // ... add 9 more blocks distributed across Nov 10-24
+  // Mix of posts and reels, various times, some with Canva links
+];
+```
+
+## Design System
+
+**Colors:**
+
+- Primary blue: #3B82F6
+- Purple (reels): #A855F7
+- Success green: #10B981
+- Gray backgrounds: #F9FAFB (page), #FFFFFF (cards)
+- Text: #111827 (primary), #6B7280 (secondary)
+
+**Typography:**
+
+- Font: Inter or system font stack
+- Headings: font-semibold
+- Sizes: text-xs, text-sm, text-base, text-lg, text-2xl
+
+**Spacing:**
+
+- Consistent: 4px, 8px, 16px, 24px, 32px
+- Border radius: rounded-lg (8px), rounded-xl (12px)
+
+**Animations:**
+
+- All transitions: 200ms ease-in-out
+- Hover: slight scale up + shadow increase
+- Active: scale 0.98
+- Smooth: use cubic-bezier(0.4, 0, 0.2, 1) for sidebars
+
+## File Structure
+
+```
+src/
+├── components/
+│   ├── Modal/
+│   │   ├── CampaignModal.jsx
+│   │   ├── StepIndicator.jsx
+│   │   └── [Step1-4].jsx
+│   ├── Calendar/
+│   │   ├── CalendarView.jsx
+│   │   ├── DayCell.jsx
+│   │   └── ContentBlock.jsx
+│   ├── Sidebar/
+│   │   ├── NavSidebar.jsx
+│   │   └── ContentSidebar.jsx
+│   └── UI/
+│       ├── Button.jsx
+│       ├── Toast.jsx
+│       └── Badge.jsx
+├── hooks/
+│   ├── useDragDrop.js
+│   └── useToast.js
+├── data/
+│   └── mockData.js
+├── App.jsx
+└── main.jsx
+```
+
+## State Management (React useState)
+
+```javascript
+// Main app state
+const [campaigns, setCampaigns] = useState([mockCampaign]);
+const [contentBlocks, setContentBlocks] = useState(mockContentBlocks);
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const [currentMonth, setCurrentMonth] = useState(new Date());
+```
+
+## Key Interactions
+
+1. **Create Campaign:** Modal → Generate content blocks distributed evenly across timeline → Show in calendar → Toast: “Campaign created!”
+1. **Drag Block:** Pick up → Move to new day → Update scheduledDate → Toast: “Moved to [date]”
+1. **Toggle Sidebar:** Smooth slide animation
+1. **Navigate Months:** Update currentMonth, re-render calendar
+1. **Edit Canva Link:** Click input → Type/paste → Auto-save to state
+1. **Delete Block:** Confirm dialog → Remove from state → Toast: “Deleted”
+
+## Toast Notifications
+
+- Position: top-right, fixed
+- Style: white, shadow-lg, rounded-lg
+- Auto-dismiss: 3 seconds
+- Types: Success (green), Error (red), Info (blue)
+
+## Critical Success Criteria
+
+✅ Multi-step modal creates campaigns
+✅ Calendar displays content blocks correctly
+✅ Drag-and-drop moves blocks between days (smooth, no bugs)
+✅ Double sidebar layout (nav left, content right)
+✅ Professional design matching Buffer/Later quality
+✅ Only uses mock data (no API calls)
+✅ Smooth animations throughout
+✅ Responsive (desktop-first)
+
+## Testing Checklist
+
+- [ ] Create campaign through all 4 steps
+- [ ] Drag block to different day
+- [ ] Reorder blocks within same day
+- [ ] Toggle content sidebar
+- [ ] Navigate calendar months
+- [ ] Add/edit Canva link
+- [ ] Delete block with confirmation
+- [ ] ESC closes modal
+- [ ] Form validation works
+- [ ] All hover states functional
+
+**Build this now. Focus on drag-and-drop perfection - it’s the core feature. Make it look professional and modern.**
