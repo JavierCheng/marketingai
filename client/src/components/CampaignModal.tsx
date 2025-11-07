@@ -52,7 +52,8 @@ export default function CampaignModal({ isOpen, onClose, onCreateCampaign }: Cam
     }
   };
 
-  const canProceedStep1 = formData.purpose && formData.description.length >= 10;
+  const wordCount = formData.description.trim().split(/\s+/).filter(word => word.length > 0).length;
+  const canProceedStep1 = formData.purpose.length > 0 && wordCount >= 5 && wordCount <= 100;
   const canProceedStep2 = formData.startDate && formData.endDate;
   const canProceedStep3 = formData.numPosts >= 1 && formData.numReels >= 1;
 
@@ -149,11 +150,18 @@ export default function CampaignModal({ isOpen, onClose, onCreateCampaign }: Cam
                 id="description"
                 placeholder="Describe your campaign..."
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value.slice(0, 500) })}
+                onChange={(e) => {
+                  const words = e.target.value.trim().split(/\s+/).filter(word => word.length > 0);
+                  if (words.length <= 100) {
+                    setFormData({ ...formData, description: e.target.value });
+                  }
+                }}
                 className="min-h-32"
                 data-testid="textarea-description"
               />
-              <p className="text-xs text-muted-foreground mt-1">{formData.description.length}/500 characters</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {wordCount}/100 words {wordCount > 100 && <span className="text-destructive">(limit exceeded)</span>}
+              </p>
             </div>
           </div>
         )}
